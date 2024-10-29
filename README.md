@@ -2,7 +2,7 @@
 
 ## Description
 
-New App is designed to help users decide on their next hairstyle by providing personalized suggestions based on their preferences. Users can input their hair length, type, desired style, and color preferences to receive hairstyle ideas. The app also offers additional features like generating images of the suggested hairstyles, audio descriptions, and the ability to save favorites.
+**New App** helps users decide on their next hairstyle by providing personalized suggestions based on their preferences. Users can input their hair length, type, desired style, and color preferences to receive hairstyle ideas. The app also offers additional features like generating images of the suggested hairstyles, audio descriptions, and the ability to save favorites.
 
 ## User Journey
 
@@ -41,8 +41,14 @@ New App is designed to help users decide on their next hairstyle by providing pe
 
 ## External API Services
 
-- **ChatGPT API**: Used to generate hairstyle suggestions based on user preferences.
+- **ChatGPT API**: Generates hairstyle suggestions based on user preferences.
 - **Image Generation API**: Generates images of the hairstyles.
 - **Text-to-Speech API**: Converts hairstyle descriptions into audio format.
 
-_NOTE: API keys for external services should be stored securely in environment variables._
+_Note: API keys for external services should be stored securely in environment variables._
+
+## Environment Variables
+
+- `VITE_PUBLIC_APP_ID`: Your ZAPT App ID.
+- `VITE_PUBLIC_SENTRY_DSN`: Your Sentry DSN for error logging.
+- `VITE_PUBLIC_APP_ENV`: The environment of the app (e.g., production, development).

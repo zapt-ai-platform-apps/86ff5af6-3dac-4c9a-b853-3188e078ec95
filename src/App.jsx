@@ -1,7 +1,5 @@
 import { createSignal, onMount, createEffect, For, Show } from 'solid-js';
 import { createEvent, supabase } from './supabaseClient';
-// import { Auth } from '@supabase/auth-ui-solid';
-// import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { SolidMarkdown } from 'solid-markdown';
 
 function App() {
@@ -21,9 +19,7 @@ function App() {
   const [favorites, setFavorites] = createSignal([]);
   const [user, setUser] = createSignal(null);
   const [currentPage, setCurrentPage] = createSignal('homePage');
-
-  // Only add authentication if required
-  // Authentication logic can be added here if needed
+  const [errorMessage, setErrorMessage] = createSignal('');
 
   const handleInputChange = (field, value) => {
     setPreferences({ ...preferences(), [field]: value });
@@ -31,6 +27,7 @@ function App() {
 
   const getSuggestions = async () => {
     setLoadingSuggestions(true);
+    setErrorMessage('');
     try {
       const prompt = `Based on the following preferences, suggest 5 hairstyle ideas. Provide the suggestions in a JSON array with each element containing "name" and "description" fields.
 Preferences:
@@ -43,9 +40,16 @@ Preferences:
         prompt,
         response_type: 'json',
       });
-      setSuggestions(result.suggestions || result);
+      if (Array.isArray(result)) {
+        setSuggestions(result);
+      } else if (Array.isArray(result.suggestions)) {
+        setSuggestions(result.suggestions);
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (error) {
       console.error('Error fetching suggestions:', error);
+      setErrorMessage('Failed to get suggestions. Please try again.');
     } finally {
       setLoadingSuggestions(false);
     }
@@ -53,6 +57,7 @@ Preferences:
 
   const generateImage = async (style) => {
     setLoadingImage(true);
+    setErrorMessage('');
     try {
       const prompt = `Generate an image of a person with ${preferences().hairLength} ${preferences().hairType} hair styled as ${style.name} with ${preferences().colorPreference} color.`;
       const imageUrl = await createEvent('generate_image', {
@@ -61,6 +66,7 @@ Preferences:
       setGeneratedImage(imageUrl.imageUrl || imageUrl);
     } catch (error) {
       console.error('Error generating image:', error);
+      setErrorMessage('Failed to generate image. Please try again.');
     } finally {
       setLoadingImage(false);
     }
@@ -68,6 +74,7 @@ Preferences:
 
   const generateAudio = async (style) => {
     setLoadingAudio(true);
+    setErrorMessage('');
     try {
       const text = `The ${style.name} is a ${preferences().desiredStyle} hairstyle that ${style.description}`;
       const audio = await createEvent('text_to_speech', {
@@ -76,6 +83,7 @@ Preferences:
       setAudioUrl(audio.audioUrl || audio);
     } catch (error) {
       console.error('Error generating audio:', error);
+      setErrorMessage('Failed to generate audio. Please try again.');
     } finally {
       setLoadingAudio(false);
     }
@@ -91,6 +99,13 @@ Preferences:
     <div class="min-h-screen bg-gradient-to-br from-pink-100 to-yellow-100 p-4">
       <div class="max-w-4xl mx-auto">
         <h1 class="text-4xl font-bold text-pink-600 mb-6 text-center">Hairstyle Helper</h1>
+
+        {/* Error Message */}
+        <Show when={errorMessage()}>
+          <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
+            {errorMessage()}
+          </div>
+        </Show>
 
         {/* Preferences Form */}
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">

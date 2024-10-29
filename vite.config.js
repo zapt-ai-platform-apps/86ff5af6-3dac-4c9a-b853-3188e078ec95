@@ -11,6 +11,6 @@ export default defineConfig({
     conditions: ['development', 'browser'],
   },
   optimizeDeps: {
-    exclude: ['@sentry/node'], // Exclude server-only dependencies
+    exclude: ['@sentry/node'],
   },
 });
