@@ -13,9 +13,20 @@ Sentry.init({
 
 export default async function handler(req, res) {
   try {
-    // Your API logic
+    const { text } = req.body;
+
+    // Replace with actual text-to-speech logic
+    const audioUrl = await convertTextToSpeech(text);
+
+    res.status(200).json({ audioUrl });
   } catch (error) {
     Sentry.captureException(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+}
+
+async function convertTextToSpeech(text) {
+  // Placeholder function for text-to-speech API call
+  // You should implement the actual API call here
+  return 'https://example.com/generated-audio.mp3';
 }

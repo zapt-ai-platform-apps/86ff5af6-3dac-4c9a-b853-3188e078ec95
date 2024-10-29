@@ -23,33 +23,7 @@ function App() {
   const [currentPage, setCurrentPage] = createSignal('homePage');
 
   // Only add authentication if required
-  // Example authentication logic commented out
-
-  // const checkUserSignedIn = async () => {
-  //   const { data: { user } } = await supabase.auth.getUser();
-  //   if (user) {
-  //     setUser(user);
-  //     setCurrentPage('homePage');
-  //   }
-  // };
-
-  // onMount(checkUserSignedIn);
-
-  // createEffect(() => {
-  //   const authListener = supabase.auth.onAuthStateChange((_, session) => {
-  //     if (session?.user) {
-  //       setUser(session.user);
-  //       setCurrentPage('homePage');
-  //     } else {
-  //       setUser(null);
-  //       setCurrentPage('login');
-  //     }
-  //   });
-
-  //   return () => {
-  //     authListener.data.unsubscribe();
-  //   };
-  // });
+  // Authentication logic can be added here if needed
 
   const handleInputChange = (field, value) => {
     setPreferences({ ...preferences(), [field]: value });
@@ -69,7 +43,7 @@ Preferences:
         prompt,
         response_type: 'json',
       });
-      setSuggestions(result);
+      setSuggestions(result.suggestions || result);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
     } finally {
@@ -84,7 +58,7 @@ Preferences:
       const imageUrl = await createEvent('generate_image', {
         prompt,
       });
-      setGeneratedImage(imageUrl);
+      setGeneratedImage(imageUrl.imageUrl || imageUrl);
     } catch (error) {
       console.error('Error generating image:', error);
     } finally {
@@ -99,7 +73,7 @@ Preferences:
       const audio = await createEvent('text_to_speech', {
         text,
       });
-      setAudioUrl(audio);
+      setAudioUrl(audio.audioUrl || audio);
     } catch (error) {
       console.error('Error generating audio:', error);
     } finally {
@@ -196,10 +170,12 @@ Preferences:
                           setSelectedStyle(style);
                           generateImage(style);
                         }}
-                        class={`flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                          loadingImage() ? 'opacity-50 cursor-not-allowed' : ''
+                        class={`flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105 ${
+                          loadingImage() && selectedStyle()?.name === style.name
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'cursor-pointer'
                         }`}
-                        disabled={loadingImage()}
+                        disabled={loadingImage() && selectedStyle()?.name === style.name}
                       >
                         {loadingImage() && selectedStyle()?.name === style.name ? 'Generating Image...' : 'Show Me'}
                       </button>
@@ -207,8 +183,8 @@ Preferences:
                         onClick={() => {
                           generateAudio(style);
                         }}
-                        class={`flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                          loadingAudio() ? 'opacity-50 cursor-not-allowed' : ''
+                        class={`flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 ${
+                          loadingAudio() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                         disabled={loadingAudio()}
                       >
