@@ -149,7 +149,7 @@ Preferences:
     }
   };
 
-  // Adjust addToFavorites function
+  // Add to Favorites function
   const addToFavorites = async (style) => {
     if (favorites().some((fav) => fav.name === style.name)) {
       return; // Already in favorites
@@ -212,7 +212,7 @@ Preferences:
         }
       >
         {/* Main App UI */}
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-4xl mx-auto h-full">
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-4xl font-bold text-pink-600">Hairstyle Helper</h1>
             <button
@@ -231,8 +231,152 @@ Preferences:
           </Show>
 
           {/* Preferences Form */}
-          {/* ... Rest of the content remains the same ... */}
-          {/* Note: For brevity, I'm not repeating code that hasn't changed. */}
+          <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-pink-600">Enter Your Preferences</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Hair Length */}
+              <div>
+                <label class="block text-gray-700 mb-2">Hair Length</label>
+                <select
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent cursor-pointer box-border"
+                  value={preferences().hairLength}
+                  onChange={(e) => handleInputChange('hairLength', e.target.value)}
+                >
+                  <option value="">Select Length</option>
+                  <option value="Short">Short</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Long">Long</option>
+                </select>
+              </div>
+              {/* Hair Type */}
+              <div>
+                <label class="block text-gray-700 mb-2">Hair Type</label>
+                <select
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent cursor-pointer box-border"
+                  value={preferences().hairType}
+                  onChange={(e) => handleInputChange('hairType', e.target.value)}
+                >
+                  <option value="">Select Type</option>
+                  <option value="Straight">Straight</option>
+                  <option value="Wavy">Wavy</option>
+                  <option value="Curly">Curly</option>
+                </select>
+              </div>
+              {/* Desired Style */}
+              <div>
+                <label class="block text-gray-700 mb-2">Desired Style</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Bob, Layers"
+                  value={preferences().desiredStyle}
+                  onInput={(e) => handleInputChange('desiredStyle', e.target.value)}
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent box-border"
+                />
+              </div>
+              {/* Color Preference */}
+              <div>
+                <label class="block text-gray-700 mb-2">Color Preference</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Natural, Highlights"
+                  value={preferences().colorPreference}
+                  onInput={(e) => handleInputChange('colorPreference', e.target.value)}
+                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent box-border"
+                />
+              </div>
+            </div>
+            <button
+              class={`mt-4 px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
+                loadingSuggestions() ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              onClick={getSuggestions}
+              disabled={loadingSuggestions()}
+            >
+              <Show when={loadingSuggestions()} fallback="Get Suggestions">
+                Loading...
+              </Show>
+            </button>
+          </div>
+
+          {/* Suggestions */}
+          <Show when={suggestions().length > 0}>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 class="text-2xl font-bold mb-4 text-pink-600">Hairstyle Suggestions</h2>
+              <div class="space-y-4">
+                <For each={suggestions()}>
+                  {(style) => (
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                      <h3 class="text-xl font-semibold text-pink-600 mb-2">{style.name}</h3>
+                      <p class="text-gray-700">{style.description}</p>
+                      <div class="flex space-x-4 mt-4">
+                        <button
+                          class={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
+                            loadingImage() ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          onClick={() => generateImage(style)}
+                          disabled={loadingImage()}
+                        >
+                          <Show when={loadingImage()} fallback="Show Me">
+                            Loading...
+                          </Show>
+                        </button>
+                        <button
+                          class={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
+                            loadingAudio() ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          onClick={() => generateAudio(style)}
+                          disabled={loadingAudio()}
+                        >
+                          <Show when={loadingAudio()} fallback="Listen">
+                            Loading...
+                          </Show>
+                        </button>
+                        <button
+                          class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
+                          onClick={() => addToFavorites(style)}
+                        >
+                          Add to Favorites
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </For>
+              </div>
+            </div>
+          </Show>
+
+          {/* Generated Image */}
+          <Show when={generatedImage()}>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 class="text-2xl font-bold mb-4 text-pink-600">Generated Image</h2>
+              <img src={generatedImage()} alt="Generated hairstyle" class="w-full rounded-lg shadow-md" />
+            </div>
+          </Show>
+
+          {/* Audio Description */}
+          <Show when={audioUrl()}>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 class="text-2xl font-bold mb-4 text-pink-600">Audio Description</h2>
+              <audio controls src={audioUrl()} class="w-full" />
+            </div>
+          </Show>
+
+          {/* Favorites */}
+          <Show when={favorites().length > 0}>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 class="text-2xl font-bold mb-4 text-pink-600">My Favorites</h2>
+              <div class="space-y-4">
+                <For each={favorites()}>
+                  {(fav) => (
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                      <h3 class="text-xl font-semibold text-pink-600 mb-2">{fav.name}</h3>
+                      <p class="text-gray-700">{fav.description}</p>
+                    </div>
+                  )}
+                </For>
+              </div>
+            </div>
+          </Show>
         </div>
       </Show>
     </div>

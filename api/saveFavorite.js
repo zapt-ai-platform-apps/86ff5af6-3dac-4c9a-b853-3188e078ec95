@@ -10,7 +10,7 @@ Sentry.init({
   initialScope: {
     tags: {
       type: 'backend',
-      projectId: process.env.PROJECT_ID,
+      projectId: process.env.VITE_PUBLIC_APP_ID,
     },
   },
 });
